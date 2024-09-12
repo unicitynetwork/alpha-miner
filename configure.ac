@@ -134,8 +134,15 @@ else
 	JANSSON_LIBS=-ljansson
 fi
 
-LIBCURL_CHECK_CONFIG(, 7.15.2, ,
-  [AC_MSG_ERROR([Missing required libcurl >= 7.15.2])])
+PKG_CHECK_MODULES([LIBCURL], [libcurl >= 7.15.2], [
+  AC_SUBST([LIBCURL_CFLAGS])
+  AC_SUBST([LIBCURL_LIBS])
+], [
+  AC_MSG_ERROR([libcurl not found])
+])
+
+
+
 
 AC_SUBST(JANSSON_LIBS)
 AC_SUBST(PTHREAD_FLAGS)
