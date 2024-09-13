@@ -20,7 +20,7 @@ Alphaminer supports:
 
 ## Build dependencies
 
-Cpuminer depends on the following libraries:
+Alphaminer depends on the following libraries:
 - libcurl, https://curl.se/libcurl/
 - jansson, https://github.com/akheron/jansson (jansson is included locally)
 - RandomX, https://github.com/sakuyama2024/RandomX (RandomX is included as a Git submodule)
@@ -118,7 +118,7 @@ make install
 
 Now build the miner using this new static version of libcurl.
 ```
-git clone https://github.com/sakuyama2024/Alpahminer --recursive
+git clone https://github.com/sakuyama2024/Alphaminer --recursive
 cd Alphaminer
 ./autogen.sh
 LIBCURL=`pkg-config --static --libs libcurl` LDFLAGS="-static -static-libgcc" ./configure CFLAGS="-DCURL_STATICLIB"
