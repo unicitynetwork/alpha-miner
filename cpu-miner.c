@@ -39,6 +39,15 @@
 #include "compat.h"
 #include "miner.h"
 
+// !ALPHA
+#include <time.h>
+#include <ctype.h>
+
+static char **coinbase_addresses = NULL;
+static int num_addresses = 0;
+static char *address_file = NULL;
+// !ALPHA END
+
 #ifdef __APPLE__
 #include "pthread_barrier.h"
 #endif
@@ -269,6 +278,10 @@ static struct option const options[] = {
 	{ "retries", 1, NULL, 'r' },
 	{ "retry-pause", 1, NULL, 'R' },
 	{ "scantime", 1, NULL, 's' },
+
+// !ALPHA
+    { "afile", 1, NULL, 1016 },
+// !ALPHA END
 #ifdef HAVE_SYSLOG_H
 	{ "syslog", 0, NULL, 'S' },
 #endif
@@ -302,6 +315,68 @@ static time_t g_work_time;
 static pthread_mutex_t g_work_lock;
 static bool submit_old = false;
 static char *lp_id;
+
+
+// !ALPHA
+static void load_addresses_from_file(const char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        applog(LOG_ERR, "Failed to open address file: %s", filename);
+        exit(1);
+    }
+
+    char line[256];
+    while (fgets(line, sizeof(line), file)) {
+        // Remove newline
+        line[strcspn(line, "\n")] = 0;
+        
+        // Remove comment (if any)
+        char *comment = strchr(line, '#');
+        if (comment) *comment = 0;
+        
+        // Trim leading and trailing whitespace
+        char *start = line;
+        char *end = line + strlen(line) - 1;
+        while (*start && isspace(*start)) start++;
+        while (end > start && isspace(*end)) *end-- = 0;
+        
+        // Skip empty lines
+        if (*start == 0) continue;
+        
+        coinbase_addresses = realloc(coinbase_addresses, (num_addresses + 1) * sizeof(char *));
+        coinbase_addresses[num_addresses] = strdup(start);
+        num_addresses++;
+    }
+
+    fclose(file);
+
+    if (num_addresses == 0) {
+        applog(LOG_ERR, "No valid addresses found in file: %s", filename);
+        exit(1);
+    }
+}
+
+
+static void select_random_address(void)
+{
+    if (num_addresses > 0) {
+        int random_index = rand() % num_addresses;
+        pk_script_size = address_to_script(pk_script, sizeof(pk_script), coinbase_addresses[random_index]);
+        applog(LOG_INFO, "Selected new payout address: %s", coinbase_addresses[random_index]);
+    } else {
+        applog(LOG_ERR, "No addresses loaded. Cannot select a new address.");
+    }
+}
+
+
+// !ALPHA END
+
+
+
+
+
+
+
 
 static inline void work_free(struct work *w)
 {
@@ -751,6 +826,9 @@ static void share_result(int result, const char *reason)
 
 	if (opt_debug && reason)
 		applog(LOG_DEBUG, "DEBUG: reject reason: %s", reason);
+    
+    if (result) 
+         select_random_address();
 }
 
 static bool submit_upstream_work(CURL *curl, struct work *work)
@@ -2017,6 +2095,13 @@ static void parse_arg(int key, char *arg, char *pname)
 		}
 		strcpy(coinbase_sig, arg);
 		break;
+// !ALPHA
+    case 1016:  // New option for address file
+        address_file = strdup(arg);
+        break;
+// !ALPHA END
+            
+            
 	case 'S':
 		use_syslog = true;
 		break;
@@ -2188,6 +2273,16 @@ int main(int argc, char *argv[])
 			return 1;
 		sprintf(rpc_userpass, "%s:%s", rpc_user, rpc_pass);
 	}
+// !ALPHA
+    if (address_file) {
+        load_addresses_from_file(address_file);
+        srand(time(NULL));  // Initialize random number generator
+        select_random_address();  // Select the first address
+    } else {
+        applog(LOG_ERR, "No address file specified. Use --address-file option.");
+        show_usage_and_exit(1);
+    }
+// !ALPHA END
 
 	// !RANDOMX
 	pthread_mutex_init(&dataset_lock, NULL);
