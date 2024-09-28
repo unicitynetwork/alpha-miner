@@ -280,7 +280,7 @@ static struct option const options[] = {
 	{ "scantime", 1, NULL, 's' },
 
 // !ALPHA
-    { "afile", 0, NULL, 1016 },
+    { "afile", 1, NULL, 1016 },
 // !ALPHA END
 #ifdef HAVE_SYSLOG_H
 	{ "syslog", 0, NULL, 'S' },
@@ -2278,7 +2278,7 @@ int main(int argc, char *argv[])
         load_addresses_from_file(address_file);
         srand(time(NULL));  // Initialize random number generator
         select_random_address();  // Select the first address
-    } 
+    }
 // !ALPHA END
 
 	// !RANDOMX
