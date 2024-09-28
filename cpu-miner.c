@@ -280,7 +280,7 @@ static struct option const options[] = {
 	{ "scantime", 1, NULL, 's' },
 
 // !ALPHA
-    { "afile", 1, NULL, 1016 },
+    { "afile", 0, NULL, 1016 },
 // !ALPHA END
 #ifdef HAVE_SYSLOG_H
 	{ "syslog", 0, NULL, 'S' },
@@ -827,7 +827,7 @@ static void share_result(int result, const char *reason)
 	if (opt_debug && reason)
 		applog(LOG_DEBUG, "DEBUG: reject reason: %s", reason);
     
-    if (result) 
+    if (result)
          select_random_address();
 }
 
@@ -2279,7 +2279,7 @@ int main(int argc, char *argv[])
         srand(time(NULL));  // Initialize random number generator
         select_random_address();  // Select the first address
     } else {
-        applog(LOG_ERR, "No address file specified. Use --address-file option.");
+        applog(LOG_ERR, "No address file specified. Use --afile option.");
         show_usage_and_exit(1);
     }
 // !ALPHA END
