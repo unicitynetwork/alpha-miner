@@ -2278,10 +2278,7 @@ int main(int argc, char *argv[])
         load_addresses_from_file(address_file);
         srand(time(NULL));  // Initialize random number generator
         select_random_address();  // Select the first address
-    } else {
-        applog(LOG_ERR, "No address file specified. Use --afile option.");
-        show_usage_and_exit(1);
-    }
+    } 
 // !ALPHA END
 
 	// !RANDOMX
