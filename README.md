@@ -55,12 +55,12 @@ Help message and options:
 
 Solo mine on 4 cpu threads, connected to a local Alpha node:
 ```
-./minerd -o 127.0.0.1:8342 -O username:password -t 4 --coinbase-addr=YOUR_ALPHA_ADDRESS
+./minerd -o 127.0.0.1:8589 -O username:password -t 4 --coinbase-addr=YOUR_ALPHA_ADDRESS
 ```
 
 Solo mine using large memory pages and disable thread binding:
 ```
-./minerd -o 127.0.0.1:8342 -O username:password -t 4 --coinbase-addr=YOUR_ALPHA_ADDRESS --largepages --no-affinity
+./minerd -o 127.0.0.1:8589 -O username:password -t 4 --coinbase-addr=YOUR_ALPHA_ADDRESS --largepages --no-affinity
 ```
 
 Benchmark 5000 hashes (default is 1000), on each of 4 miner threads (default will use number of processors):
