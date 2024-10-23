@@ -4,7 +4,7 @@ Alphaminer is a free, high performance, open source, cross platform CPU miner fo
 
 The software has been tested on Linux, Windows, macOS and on Intel/AMD x86-64 and ARM64 processors.
 
-ALpha uses RandomX 1.2.1 as it's mining algorithm
+Alphaminer uses RandomX 1.2.1 as it's mining algorithm
 
 ## Features
 
@@ -14,7 +14,7 @@ Alphaminer supports:
 - Hiveon OS
 
 ## Download
-- Binary releases: TODO
+- Binary releases: 
 - Build from source (recommended)
 
 
@@ -23,7 +23,7 @@ Alphaminer supports:
 Alphaminer depends on the following libraries:
 - libcurl, https://curl.se/libcurl/
 - jansson, https://github.com/akheron/jansson (jansson is included locally)
-- RandomX, https://github.com/sakuyama2024/RandomX (RandomX is included as a Git submodule)
+- RandomX, https://github.com/unicitynetwork/RandomX (RandomX is included as a Git submodule)
 
 ## Linux
 
@@ -38,8 +38,8 @@ sudo apt install autoconf pkg-config g++ make libcurl4-openssl-dev
 
 ### Build instructions
 ```
-git clone https://github.com/sakuyama2024/Alphaminer --recursive
-cd Alphaminer
+git clone https://github.com/unicitynetwork/alpha-miner --recursive
+cd alpha-miner
 ./autogen.sh
 ./configure
 make
@@ -91,7 +91,7 @@ To build a native Windows application which must run in a MSYS2 terminal.
 
 In MSYS2 terminal:
 ```
-git clone https://github.com/sakuyama2024/Alphaminer --recursive
+git clone https://github.com/unicitynetwork/alpha-miner --recursive
 cd Alphaminer
 ./autogen.sh
 LIBCURL="-lcurl.dll" ./configure
@@ -118,8 +118,8 @@ make install
 
 Now build the miner using this new static version of libcurl.
 ```
-git clone https://github.com/sakuyama2024/Alphaminer --recursive
-cd Alphaminer
+git clone https://github.com/unicitynetwork/alpha-miner --recursive
+cd alpha-miner
 ./autogen.sh
 LIBCURL=`pkg-config --static --libs libcurl` LDFLAGS="-static -static-libgcc" ./configure CFLAGS="-DCURL_STATICLIB"
 make
