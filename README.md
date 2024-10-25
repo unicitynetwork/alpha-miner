@@ -33,8 +33,6 @@ cd alpha-miner
 make
 ```
 
-
-
 ## Linux
 
 To build for Ubuntu Linux (or WSL in Windows)
@@ -56,27 +54,6 @@ make
 ```
 
 !! Don't forget the --recursive !!
-
-
-Help message and options:
-```
-./minerd -h
-```
-
-Solo mine on 4 cpu threads, connected to a local Alpha node:
-```
-./minerd -o 127.0.0.1:8589 -O username:password -t 4 --coinbase-addr=YOUR_ALPHA_ADDRESS
-```
-
-Solo mine using large memory pages and disable thread binding:
-```
-./minerd -o 127.0.0.1:8589 -O username:password -t 4 --coinbase-addr=YOUR_ALPHA_ADDRESS --largepages --no-affinity
-```
-
-Benchmark 5000 hashes (default is 1000), on each of 4 miner threads (default will use number of processors):
-```
-./minerd --benchmark --nonces 5000 -t 4
-```
 
 ## Windows
 
@@ -135,21 +112,27 @@ LIBCURL=`pkg-config --static --libs libcurl` LDFLAGS="-static -static-libgcc" ./
 make
 ```
 
-### Usage
-
-Usage is same as shown above for Linux e.g.
+## Usage
 
 Help message and options:
 ```
-./minerd.exe -h
+./minerd -h
 ```
 
-Solo mine connected to a local Alpha node:
+Test the performance
+
 ```
-./minerd.exe -o 127.0.0.1:8342 -O username:password --coinbase-addr=YOUR_ALPHA_ADDRESS
+./minerd --benchmark 
 ```
 
-Mine at a pool using large memory pages:
+Solo mine on 4 cpu threads, connected to a local Alpha node. Replace username:paswword with the rpc user and password in the Alpha configuration file alpha.conf. 
+
 ```
-./minerd.exe --url=stratum+tcps://pool.domain.com:1234 --user=checkyourpool --pass=checkyourpool --largepages
+./minerd -o 127.0.0.1:8589 -O username:password -t 4 --coinbase-addr=YOUR_ALPHA_ADDRESS
+```
+
+
+Solo mine using large memory pages and disable thread binding:
+```
+./minerd -o 127.0.0.1:8589 -O username:password -t 4 --coinbase-addr=YOUR_ALPHA_ADDRESS --largepages --no-affinity
 ```
