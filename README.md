@@ -13,10 +13,6 @@ Alphaminer supports:
 - Mining pools (Stratum V1 protocol) (TODO
 - Hiveon OS
 
-## Download
-- Binary releases: 
-- Build from source (recommended)
-
 
 ## Build dependencies
 
@@ -24,6 +20,20 @@ Alphaminer depends on the following libraries:
 - libcurl, https://curl.se/libcurl/
 - jansson, https://github.com/akheron/jansson (jansson is included locally)
 - RandomX, https://github.com/unicitynetwork/RandomX (RandomX is included as a Git submodule)
+
+## MacOS
+
+
+```
+brew install git automake libtool pkg-config curl
+git clone https://github.com/unicitynetwork/alpha-miner --recursive
+cd alpha-miner
+./autogen.sh
+./configure
+make
+```
+
+
 
 ## Linux
 
