@@ -12,7 +12,10 @@ Alphaminer supports:
 - Solo mining with Alpha node (RPC getblocktemplate)
 - Mining pools (Stratum V1 protocol) (TODO
 - Hiveon OS
+- 
+## Download
 
+Binary releases: https://github.com/unicitynetwork/alpha-miner/releases
 
 ## Build dependencies
 
@@ -32,6 +35,7 @@ cd alpha-miner
 ./configure
 make
 ```
+./minerd -h (examples below)
 
 ## Linux
 
@@ -52,8 +56,13 @@ cd alpha-miner
 ./configure
 make
 ```
+### Build static library
 
-!! Don't forget the --recursive !!
+Run the script build-linux-static.sh which uses Docker to build a static binary for Linux in the out folder.
+```
+./build-linux-static.sh
+out/minerd --version
+```
 
 ## Windows
 
