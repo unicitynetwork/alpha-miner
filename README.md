@@ -10,9 +10,9 @@ Alphaminer uses RandomX 1.2.1 as it's mining algorithm
 
 Alphaminer supports:
 - Solo mining with Alpha node (RPC getblocktemplate)
-- Mining pools (Stratum V1 protocol) (TODO
+- Mining pools (Stratum V1 protocol)
 - Hiveon OS
-- 
+
 ## Download
 
 Binary releases: https://github.com/unicitynetwork/alpha-miner/releases
