@@ -13,6 +13,14 @@ Alphaminer supports:
 - Mining pools (Stratum V1 protocol)
 - Hiveon OS
 
+
+## Community Mining
+If you would like to support developement then add the community address to the list of mining address - see below for usage. Current community address is 
+
+```
+alpha1qmmqcy66tyjfq5rgngxk4p2r34y9ny7cnnfq3wmfw8fyx03yahxkq0ck3kh
+```
+
 ## Download
 
 Binary releases: https://github.com/unicitynetwork/alpha-miner/releases
@@ -23,6 +31,27 @@ Alphaminer depends on the following libraries:
 - libcurl, https://curl.se/libcurl/
 - jansson, https://github.com/akheron/jansson (jansson is included locally)
 - RandomX, https://github.com/unicitynetwork/RandomX (RandomX is included as a Git submodule)
+
+## Linux
+
+To build for Ubuntu Linux (or WSL in Windows)
+
+### Install dependencies
+```
+sudo apt update
+sudo apt upgrade
+sudo apt install autoconf git build-essential pkg-config libcurl4-openssl-dev
+```
+
+### Build instructions
+```
+git clone https://github.com/unicitynetwork/alpha-miner --recursive
+cd alpha-miner
+./autogen.sh
+./configure
+make
+```
+
 
 ## MacOS
 
@@ -37,32 +66,7 @@ make
 ```
 ./minerd -h (examples below)
 
-## Linux
 
-To build for Ubuntu Linux (or WSL in Windows)
-
-### Install dependencies
-```
-sudo apt update
-sudo apt upgrade
-sudo apt install autoconf pkg-config g++ make libcurl4-openssl-dev
-```
-
-### Build instructions
-```
-git clone https://github.com/unicitynetwork/alpha-miner --recursive
-cd alpha-miner
-./autogen.sh
-./configure
-make
-```
-### Build static library
-
-Run the script build-linux-static.sh which uses Docker to build a static binary for Linux in the out folder.
-```
-./build-linux-static.sh
-out/minerd --version
-```
 
 ## Windows
 
@@ -77,6 +81,7 @@ Download and run installer (https://www.msys2.org/)
 ### Install dependencies
 
 In MSYS2 terminal:
+
 ```
 pacman -S git autoconf pkgconf automake make mingw-w64-ucrt-x86_64-curl mingw-w64-ucrt-x86_64-gcc
 ```
@@ -86,6 +91,7 @@ pacman -S git autoconf pkgconf automake make mingw-w64-ucrt-x86_64-curl mingw-w6
 To build a native Windows application which must run in a MSYS2 terminal.
 
 In MSYS2 terminal:
+
 ```
 git clone https://github.com/unicitynetwork/alpha-miner --recursive
 cd Alphaminer
@@ -101,6 +107,7 @@ To build a native Windows application which can run in Terminal and PowerShell.
 In MSYS2 terminal:
 
 Build a static version of libcurl which uses Windows SSL (Schannel) instead of OpenSSL.
+
 ```
 pacman -S libtool
 wget https://curl.se/download/curl-8.7.1.tar.gz
@@ -113,6 +120,7 @@ make install
 ```
 
 Now build the miner using this new static version of libcurl.
+
 ```
 git clone https://github.com/unicitynetwork/alpha-miner --recursive
 cd alpha-miner
@@ -128,20 +136,51 @@ Help message and options:
 ./minerd -h
 ```
 
-Test the performance
+First test the performance
 
 ```
 ./minerd --benchmark 
 ```
 
+Test the performance with largepages. This can give an improvement of 100% in hashrate. 
+
+```
+./minerd --benchmark --largepages
+```
+
+Ensure you have access to a node that accepts RPC calls. Use the -server flag when running the node daemon or add the following to the alpha.conf configuration file. Choose a secure username and password.
+
+```
+server=1
+rpcuser=YOUR_RPC_USERNAME
+rpcpassword=YOUR_RPC_PASSWORD
+```
+
+If the node software is running on a different machine from the miner then you need to allow the miner to make RPC calls by adding the following to the node alpha.conf configuration file.
+
+```
+rpcbind=0.0.0.0
+rpcallowip= MINER_IP_ADDRESS
+```
+
+Create an addresses file, e.g. "addresses.txt" This allows for a different address to be randomly selected every time the miner wins a block reward. If you would like to support developement then add the community address to the list of addresses. The addresses file should contain one address per line:
+
+```
+alpha1qhhjespxz2wrd8l39d0m5ntswhsxza7dxz02yfg
+alpha1q54mypfl9wyx7z6h523qx242dr77nmensthmfu5
+...
+```
+
+
 Solo mine on 4 cpu threads, connected to a local Alpha node. Replace username:paswword with the rpc user and password in the Alpha configuration file alpha.conf. 
 
 ```
-./minerd -o 127.0.0.1:8589 -O username:password -t 4 --coinbase-addr=YOUR_ALPHA_ADDRESS
+./minerd -o 127.0.0.1:8589 -O YOUR_RPC_USERNAME:YOUR_RPC_PASSWORD -t 4 --afile="addresses.txt" 
 ```
 
 
-Solo mine using large memory pages and disable thread binding:
+Solo mine using large memory pages 
+
 ```
-./minerd -o 127.0.0.1:8589 -O username:password -t 4 --coinbase-addr=YOUR_ALPHA_ADDRESS --largepages --no-affinity
+./minerd -o 127.0.0.1:8589 -O username:password  --afile="addresses.txt" --largepages
 ```
