@@ -1,10 +1,8 @@
 # Alphaminer
 
-Alphaminer is a free, high performance, open source, cross platform CPU miner for mining Alpha
-
-The software has been tested on Linux, Windows, macOS and on Intel/AMD x86-64 and ARM64 processors.
-
-Alphaminer uses RandomX 1.2.1 as it's mining algorithm
+- Alphaminer is a free, high performance, open source, cross platform CPU miner for mining Alpha.
+- The software has been tested on Linux, Windows, macOS and on Intel/AMD x86-64 and ARM64 processors.
+- Alphaminer uses RandomX 1.2.1 as its mining algorithm.
 
 ## Features
 
@@ -12,10 +10,12 @@ Alphaminer supports:
 - Solo mining with Alpha node (RPC getblocktemplate)
 - Mining pools (Stratum V1 protocol)
 - Hiveon OS
+- Large pages for improved performance
+- Multi-threading capability
 
 
 ## Community Mining
-If you would like to support developement then add the community address to the list of mining address - see below for usage. Current community address is 
+If you would like to support the development, then you can add the community address to the list of mining addresses - see below for setup. Current ALPHA community address is 
 
 ```
 alpha1qmmqcy66tyjfq5rgngxk4p2r34y9ny7cnnfq3wmfw8fyx03yahxkq0ck3kh
@@ -23,7 +23,8 @@ alpha1qmmqcy66tyjfq5rgngxk4p2r34y9ny7cnnfq3wmfw8fyx03yahxkq0ck3kh
 
 ## Download
 
-Binary releases: https://github.com/unicitynetwork/alpha-miner/releases
+- [Binary Releases](https://github.com/unicitynetwork/alpha-miner/releases)
+- [RandomX Algorithm](https://github.com/unicitynetwork/RandomX)
 
 ## Build dependencies
 
@@ -89,7 +90,6 @@ pacman -S git autoconf pkgconf automake make mingw-w64-ucrt-x86_64-curl mingw-w6
 ### Build instructions (for running in MSYS2)
 
 To build a native Windows application which must run in a MSYS2 terminal.
-
 In MSYS2 terminal:
 
 ```
@@ -103,10 +103,7 @@ make
 ### Build instructions (for running anywhere on Windows)
 
 To build a native Windows application which can run in Terminal and PowerShell.
-
-In MSYS2 terminal:
-
-Build a static version of libcurl which uses Windows SSL (Schannel) instead of OpenSSL.
+In MSYS2 terminal, build a static version of libcurl which uses Windows SSL (Schannel) instead of OpenSSL.
 
 ```
 pacman -S libtool
@@ -129,26 +126,26 @@ LIBCURL=`pkg-config --static --libs libcurl` LDFLAGS="-static -static-libgcc" ./
 make
 ```
 
-## Usage
+## How to use
 
-Help message and options:
+- Help message and options:
 ```
 ./minerd -h
 ```
 
-First test the performance
+- First test the performance
 
 ```
 ./minerd --benchmark 
 ```
 
-Test the performance with largepages. This can give an improvement of 100% in hashrate. 
+- Test the performance with largepages. This can give an improvement of 100% in hashrate. 
 
 ```
 ./minerd --benchmark --largepages
 ```
 
-Ensure you have access to a node that accepts RPC calls. Use the -server flag when running the node daemon or add the following to the alpha.conf configuration file. Choose a secure username and password.
+- Ensure you have access to a node that accepts RPC calls. Use the -server flag when running the node daemon or add the following to the **alpha.conf** configuration file. Choose a secure username and password.
 
 ```
 server=1
@@ -156,14 +153,19 @@ rpcuser=YOUR_RPC_USERNAME
 rpcpassword=YOUR_RPC_PASSWORD
 ```
 
-If the node software is running on a different machine from the miner then you need to allow the miner to make RPC calls by adding the following to the node alpha.conf configuration file.
+- If the node software is running on a different machine from the miner then you need to allow the miner to make RPC calls by adding the following to the node **alpha.conf** configuration file. 
 
 ```
 rpcbind=0.0.0.0
 rpcallowip= MINER_IP_ADDRESS
 ```
 
-Create an addresses file, e.g. "addresses.txt" This allows for a different address to be randomly selected every time the miner wins a block reward. If you would like to support developement then add the community address to the list of addresses. The addresses file should contain one address per line:
+- For editing the **alpha.conf** file in the node software UI:
+  - go to **"Settings"** tab -> **"Options"** -> click **"Open Configuration File"**, make the necessary edits and save the file
+  - make sure that **"Enable RPC server"** is ticked under **"Options"**
+
+
+- Create an addresses file, e.g. **"addresses.txt"**. This allows for a different address to be randomly selected every time the miner wins a block reward. If you would like to support developement then add the community address to the list of addresses. The addresses file should contain one address per line:
 
 ```
 alpha1qhhjespxz2wrd8l39d0m5ntswhsxza7dxz02yfg
@@ -172,14 +174,14 @@ alpha1q54mypfl9wyx7z6h523qx242dr77nmensthmfu5
 ```
 
 
-Solo mine on 4 cpu threads, connected to a local Alpha node. Replace username:paswword with the rpc user and password in the Alpha configuration file alpha.conf. 
+- Solo mine on 4 CPU threads, connected to a local Alpha node. Replace username:password with the RPC user and password in the Alpha configuration file **alpha.conf**. 
 
 ```
 ./minerd -o 127.0.0.1:8589 -O YOUR_RPC_USERNAME:YOUR_RPC_PASSWORD -t 4 --afile="addresses.txt" 
 ```
 
 
-Solo mine using large memory pages 
+- Solo mine using large memory pages 
 
 ```
 ./minerd -o 127.0.0.1:8589 -O username:password  --afile="addresses.txt" --largepages
