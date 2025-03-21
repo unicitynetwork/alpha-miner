@@ -1,5 +1,10 @@
 FROM alpine:3.19.1 AS builder
 
+# Build arguments
+ARG VERSION="dev"
+ARG GIT_COMMIT="unknown"
+ARG BUILD_DATE="unknown"
+
 # Install build dependencies
 RUN apk update && apk add --no-cache \
     binutils \
@@ -43,6 +48,21 @@ RUN strip -s minerd
 
 # Create minimal runtime image
 FROM alpine:3.19.1
+
+# Build arguments again for labeling
+ARG VERSION="dev"
+ARG GIT_COMMIT="unknown"
+ARG BUILD_DATE="unknown"
+
+# Add labels
+LABEL org.opencontainers.image.title="Alpha Miner"
+LABEL org.opencontainers.image.description="CPU miner for Alpha cryptocurrency"
+LABEL org.opencontainers.image.version=$VERSION
+LABEL org.opencontainers.image.revision=$GIT_COMMIT
+LABEL org.opencontainers.image.created=$BUILD_DATE
+LABEL org.opencontainers.image.vendor="Unicity Network"
+LABEL org.opencontainers.image.url="https://github.com/unicitynetwork/alpha-miner"
+LABEL org.opencontainers.image.licenses="GPL-3.0"
 
 # Install runtime dependencies
 RUN apk add --no-cache coreutils
