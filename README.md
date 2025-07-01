@@ -231,3 +231,17 @@ alpha1q54mypfl9wyx7z6h523qx242dr77nmensthmfu5
 ```
 ./minerd -o 127.0.0.1:8589 -O username:password  --afile="addresses.txt" --largepages
 ```
+
+## Pool Mining (Stratum)
+
+- Connect to a mining pool using your wallet address:
+
+```
+./minerd -o stratum+tcp://pool.example.com:3333 -u YOUR_WALLET_ADDRESS -p x -t 4
+```
+
+- Pool mining with large pages:
+
+```
+./minerd -o stratum+tcp://pool.example.com:3333 -u YOUR_WALLET_ADDRESS -p x --largepages
+```
