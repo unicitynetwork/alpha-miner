@@ -32,20 +32,60 @@ Alphaminer depends on the following libraries:
 - libcurl, https://curl.se/libcurl/
 - jansson, https://github.com/akheron/jansson (jansson is included locally)
 - RandomX, https://github.com/unicitynetwork/RandomX (RandomX is included as a Git submodule)
+- GMP (GNU Multiple Precision Arithmetic Library), https://gmplib.org/
 
 ## Linux
 
-To build for Ubuntu Linux (or WSL in Windows)
+### Ubuntu/Debian
 
-### Install dependencies
-```
+#### Install dependencies
+```bash
 sudo apt update
 sudo apt upgrade
-sudo apt install autoconf git build-essential pkg-config libcurl4-openssl-dev
+sudo apt install autoconf git build-essential pkg-config libcurl4-openssl-dev libgmp-dev
 ```
 
-### Build instructions
+#### Build instructions
+```bash
+git clone https://github.com/unicitynetwork/alpha-miner --recursive
+cd alpha-miner
+./autogen.sh
+./configure
+make
 ```
+
+### CentOS/RHEL/Fedora
+
+#### Install dependencies
+
+For CentOS/RHEL 8+:
+```bash
+sudo dnf install autoconf git gcc gcc-c++ make pkgconfig libcurl-devel gmp-devel
+```
+
+For older CentOS/RHEL 7:
+```bash
+sudo yum install autoconf git gcc gcc-c++ make pkgconfig libcurl-devel gmp-devel
+```
+
+#### Build instructions
+```bash
+git clone https://github.com/unicitynetwork/alpha-miner --recursive
+cd alpha-miner
+./autogen.sh
+./configure
+make
+```
+
+### Arch Linux
+
+#### Install dependencies
+```bash
+sudo pacman -S autoconf git gcc make pkg-config curl gmp
+```
+
+#### Build instructions
+```bash
 git clone https://github.com/unicitynetwork/alpha-miner --recursive
 cd alpha-miner
 ./autogen.sh
@@ -56,16 +96,21 @@ make
 
 ## MacOS
 
-
+### Install dependencies
+```bash
+brew install git automake libtool pkg-config curl gmp
 ```
-brew install git automake libtool pkg-config curl
+
+### Build instructions
+```bash
 git clone https://github.com/unicitynetwork/alpha-miner --recursive
 cd alpha-miner
 ./autogen.sh
 ./configure
 make
 ```
-./minerd -h (examples below)
+
+**Note:** The build system automatically detects GMP installation paths on macOS (via Homebrew), Linux, and Windows. No manual configuration of include or library paths is required.
 
 
 
@@ -84,7 +129,7 @@ Download and run installer (https://www.msys2.org/)
 In MSYS2 terminal:
 
 ```
-pacman -S git autoconf pkgconf automake make mingw-w64-ucrt-x86_64-curl mingw-w64-ucrt-x86_64-gcc
+pacman -S git autoconf pkgconf automake make mingw-w64-ucrt-x86_64-curl mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-gmp
 ```
 
 ### Build instructions (for running in MSYS2)
