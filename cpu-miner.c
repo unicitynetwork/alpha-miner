@@ -1322,7 +1322,6 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 	}
 
 	//diff_to_target(work->target, sctx->job.diff / 65536.0);
-    //sctx->job.diff = 1; // Convert to float
 	diff_to_target_gmp(work->target, sctx->job.diff);
 
 	if (opt_debug) {
@@ -1340,8 +1339,7 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 		bin2hex(target_hex, target_be, 32);
 		applog(LOG_DEBUG, "DEBUG: diff = %.8f, target = %s", sctx->job.diff, target_hex);
 	}
-
-	int asdfasd=1;
+	int tmp=1;
 }
 
 // RandomX VM data structures shared by mining threads
