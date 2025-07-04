@@ -76,7 +76,12 @@ if test "x$GMP_LIBS" != "x-lgmp"; then
   LDFLAGS="$LDFLAGS $gmp_ldflags"
 fi
 
-AC_CHECK_LIB([gmp], [__gmpz_init], [], [AC_MSG_ERROR([GNU MP library not found. Please install libgmp-dev or gmp via your package manager.])])
+# Save current LIBS to restore later
+saved_LIBS="$LIBS"
+LIBS="$LIBS $GMP_LIBS"
+AC_CHECK_LIB([gmp], [__gmpz_init], [], [AC_MSG_ERROR([GNU MP library not found. Please install libgmp-dev or gmp via your package manager.])], [])
+# Restore LIBS to prevent automatic addition of -lgmp
+LIBS="$saved_LIBS"
 
 AC_CHECK_DECLS([be32dec, le32dec, be32enc, le32enc], [], [],
 [AC_INCLUDES_DEFAULT
