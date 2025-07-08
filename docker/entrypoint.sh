@@ -44,30 +44,45 @@ else
     fi
   done
   
-  # Only check for addresses file if not in benchmark mode
+  # Only check for addresses file if not in benchmark mode and not pool mining
   if [ $BENCHMARK_MODE -eq 0 ]; then
-    # Find the index of --afile flag or addrs.txt reference
-    HAS_AFILE=0
-    for arg in "$@"; do
-      if echo "$arg" | grep -q -E "^--afile=|^--afile |addrs.txt"; then
-        HAS_AFILE=1
+    # Check if this is pool mining (has -u or --user flag)
+    POOL_MINING=0
+    for i in $(seq 1 $#); do
+      arg=$(eval echo \${$i})
+      # Check for -u or --user flag (with or without =)
+      if [ "$arg" = "-u" ] || [ "$arg" = "--user" ] || echo "$arg" | grep -q -E "^-u=|^--user="; then
+        POOL_MINING=1
         break
       fi
     done
     
-    # If no --afile specified, add it to arguments
-    if [ $HAS_AFILE -eq 0 ]; then
-      set -- "$@" "--afile=addrs.txt"
-    fi
-    
-    # Check if addrs.txt exists (only if not in benchmark mode)
-    if [ ! -f "/home/miner/addrs.txt" ]; then
-      echo "ERROR: addrs.txt file not found!"
-      echo "You must mount an addresses file to /home/miner/addrs.txt"
-      echo ""
-      echo "Example:"
-      echo "docker run -v /path/to/your/addrs.txt:/home/miner/addrs.txt alpha-miner"
-      exit 1
+    # For solo mining (not pool mining), handle --afile
+    if [ $POOL_MINING -eq 0 ]; then
+      # Check if --afile is already specified
+      HAS_AFILE=0
+      for arg in "$@"; do
+        if echo "$arg" | grep -q -E "^--afile=|^--afile |^-a=|^-a "; then
+          HAS_AFILE=1
+          break
+        fi
+      done
+      
+      # For solo mining, if no --afile specified, add it
+      if [ $HAS_AFILE -eq 0 ]; then
+        set -- "$@" "--afile=addrs.txt"
+        echo "Auto-adding --afile=addrs.txt for solo mining"
+      fi
+      
+      # Now check if addrs.txt exists (required for solo mining)
+      if [ ! -f "/home/miner/addrs.txt" ]; then
+        echo "ERROR: addrs.txt file not found!"
+        echo "You must mount an addresses file to /home/miner/addrs.txt"
+        echo ""
+        echo "Example:"
+        echo "docker run -v /path/to/your/addrs.txt:/home/miner/addrs.txt alpha-miner"
+        exit 1
+      fi
     fi
   fi
   

@@ -19,30 +19,18 @@ RUN apk update && apk add --no-cache \
     autoconf \
     automake \
     libtool \
-    git
+    git \
+    gmp-dev
 
-# Install curl dependencies
-RUN apk add --no-cache mbedtls-dev mbedtls-static curl-dev curl-static zlib-static
-
-# Download and build curl with static linking
-RUN wget -c https://curl.se/download/curl-8.7.1.tar.gz -O - | tar -xz -C /opt/
-WORKDIR /opt/curl-8.7.1
-RUN autoreconf -fi
-RUN ./configure --with-mbedtls --disable-shared --disable-ftp --disable-file \
-    --disable-ldap --disable-ldaps --disable-rtsp --disable-dict --disable-telnet \
-    --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp \
-    --disable-gopher --disable-sspi --disable-mqtt --disable-manual --disable-docs \
-    --disable-ntlm --disable-largefile --without-libidn2 --disable-tls-srp \
-    --disable-libcurl-option --disable-alt-svc --disable-headers-api --disable-verbose \
-    --disable-ares --disable-aws --disable-netrc --without-brotli --without-nghttp2 \
-    --without-libpsl --without-zstd
-RUN make -j $(nproc) install
+# Install development dependencies for libcurl
+RUN apk add --no-cache \
+    curl-dev
 
 # Copy alpha-miner source and build
 WORKDIR /opt/alpha-miner
 COPY . .
 RUN ./autogen.sh
-RUN LDFLAGS="-static -static-libgcc" ./configure
+RUN ./configure
 RUN make -j $(nproc)
 RUN strip -s minerd
 
@@ -65,7 +53,12 @@ LABEL org.opencontainers.image.url="https://github.com/unicitynetwork/alpha-mine
 LABEL org.opencontainers.image.licenses="GPL-3.0"
 
 # Install runtime dependencies
-RUN apk add --no-cache coreutils
+RUN apk add --no-cache \
+    coreutils \
+    libcurl \
+    libgcc \
+    libstdc++ \
+    gmp
 
 # Create a non-root user to run the miner
 RUN adduser -D miner
