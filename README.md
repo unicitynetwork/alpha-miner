@@ -32,6 +32,7 @@ Alphaminer depends on the following libraries:
 - libcurl, https://curl.se/libcurl/
 - jansson, https://github.com/akheron/jansson (jansson is included locally)
 - RandomX, https://github.com/unicitynetwork/RandomX (RandomX is included as a Git submodule)
+- GMP (GNU Multiple Precision Arithmetic Library), https://gmplib.org/
 
 ## Linux
 
@@ -41,11 +42,10 @@ Alphaminer depends on the following libraries:
 ```bash
 sudo apt update
 sudo apt upgrade
-sudo apt install autoconf git build-essential pkg-config libcurl4-openssl-dev
+sudo apt install autoconf git build-essential pkg-config libcurl4-openssl-dev libgmp-dev
 ```
 
 #### Build instructions
-
 ```bash
 git clone https://github.com/unicitynetwork/alpha-miner --recursive
 cd alpha-miner
@@ -103,7 +103,6 @@ make
 ```bash
 brew install git automake libtool pkg-config curl
 ```
-
 ### Build instructions
 ```bash
 git clone https://github.com/unicitynetwork/alpha-miner --recursive
@@ -129,7 +128,7 @@ Download and run installer (https://www.msys2.org/)
 In MSYS2 terminal:
 
 ```
-pacman -S git autoconf pkgconf automake make mingw-w64-ucrt-x86_64-curl mingw-w64-ucrt-x86_64-gcc
+pacman -S git autoconf pkgconf automake make mingw-w64-ucrt-x86_64-curl mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-gmp
 ```
 
 ### Build instructions (for running in MSYS2)
