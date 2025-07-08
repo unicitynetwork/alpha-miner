@@ -9,7 +9,7 @@ Alpha-miner is a CPU cryptocurrency miner for Alpha using the RandomX 1.2.1 algo
 - Standard build: `./autogen.sh && ./configure && make`
 - Build with large pages (recommended): `./configure --with-largepages && make`
 - Clean build: `make clean && make`
-- Install dependencies (Ubuntu/Debian): `sudo apt install autoconf git build-essential pkg-config libcurl4-openssl-dev libgmp-dev`
+- Install dependencies (Ubuntu/Debian): `sudo apt install autoconf git build-essential pkg-config libcurl4-openssl-dev`
 
 ## Testing Commands
 - RandomX tests: `cd RandomX && cmake . && make && ./randomx-tests`
@@ -21,8 +21,7 @@ Alpha-miner is a CPU cryptocurrency miner for Alpha using the RandomX 1.2.1 algo
 Key files and their purposes:
 - `cpu-miner.c`: Main program entry, command-line parsing, thread management
 - `randomx-miner.c`: RandomX algorithm integration and mining logic
-- `util.c`: Network communication, JSON-RPC, Stratum protocol implementation
-- `diff_to_target_gmp.c`: Difficulty/target conversions using GMP library
+- `util.c`: Network communication, JSON-RPC, Stratum protocol implementation, difficulty/target conversions
 - `/RandomX/`: Complete RandomX PoW algorithm implementation with JIT support
 - `/compat/jansson/`: Embedded JSON parsing library
 - `/hiveon/`: HiveOS integration scripts (h-manifest.conf, h-config.sh, h-run.sh)

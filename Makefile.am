@@ -11,8 +11,8 @@ SUBDIRS		= compat
 
 bin_PROGRAMS	= minerd
 
-minerd_SOURCES	= elist.h miner.h compat.h diff_to_target_gmp.h \
-		  cpu-miner.c util.c diff_to_target_gmp.c \
+minerd_SOURCES	= elist.h miner.h compat.h \
+		  cpu-miner.c util.c \
 		  sha2.c \
 		  randomx-miner.c \
 		  pthread_barrier.c \
@@ -80,6 +80,6 @@ endif
 endif
 
 minerd_LDFLAGS	= $(PTHREAD_FLAGS)
-minerd_LDADD	= @LIBCURL_LIBS@ @JANSSON_LIBS@ @PTHREAD_LIBS@ @WS2_LIBS@ @GMP_LIBS@
-minerd_CFLAGS	= -fno-strict-aliasing $(RANDOMX_FLAGS) @GMP_CFLAGS@
-minerd_CPPFLAGS	= @LIBCURL_CFLAGS@ $(JANSSON_INCLUDES) $(PTHREAD_FLAGS) $(RANDOMX_FLAGS) @GMP_CFLAGS@
+minerd_LDADD	= @LIBCURL_LIBS@ @JANSSON_LIBS@ @PTHREAD_LIBS@ @WS2_LIBS@
+minerd_CFLAGS	= -fno-strict-aliasing $(RANDOMX_FLAGS)
+minerd_CPPFLAGS	= @LIBCURL_CFLAGS@ $(JANSSON_INCLUDES) $(PTHREAD_FLAGS) $(RANDOMX_FLAGS) -s

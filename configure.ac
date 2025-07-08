@@ -30,59 +30,6 @@ AC_CHECK_HEADERS([sys/sysctl.h], [], [],
 #endif
 ])
 
-# Check for GMP library with automatic path detection
-# First try to detect GMP using pkg-config
-PKG_CHECK_MODULES([GMP], [gmp], [
-  # pkg-config found GMP, add flags to compile environment
-  CPPFLAGS="$CPPFLAGS $GMP_CFLAGS"
-  # Note: GMP_LIBS will be added via minerd_LDADD in Makefile.am
-  AC_SUBST([GMP_CFLAGS])
-  AC_SUBST([GMP_LIBS])
-], [
-  # Fallback: Try common installation paths (especially for macOS Homebrew)
-  GMP_CFLAGS=""
-  GMP_LIBS="-lgmp"
-  
-  # Check common paths for GMP headers and libraries
-  gmp_search_paths="/usr/local /opt/homebrew /usr"
-  
-  for gmp_path in $gmp_search_paths; do
-    if test -f "$gmp_path/include/gmp.h"; then
-      if test "$gmp_path" != "/usr"; then
-        GMP_CFLAGS="-I$gmp_path/include"
-        CPPFLAGS="$CPPFLAGS $GMP_CFLAGS"
-      fi
-      if test -d "$gmp_path/lib"; then
-        if test "$gmp_path" != "/usr"; then
-          GMP_LIBS="-L$gmp_path/lib -lgmp"
-          # Note: Library path will be added via minerd_LDADD in Makefile.am
-        fi
-      fi
-      break
-    fi
-  done
-  
-  AC_SUBST([GMP_CFLAGS])
-  AC_SUBST([GMP_LIBS])
-])
-
-# Test if we can actually use GMP
-AC_CHECK_HEADER([gmp.h], [], [AC_MSG_ERROR([GNU MP headers not found. Please install libgmp-dev or gmp via your package manager.])])
-
-# Add GMP library path to LDFLAGS for all subsequent link tests
-if test "x$GMP_LIBS" != "x-lgmp"; then
-  # Extract library path from GMP_LIBS (e.g., "-L/path/to/lib -lgmp")
-  gmp_ldflags=$(echo "$GMP_LIBS" | sed 's/-lgmp//')
-  LDFLAGS="$LDFLAGS $gmp_ldflags"
-fi
-
-# Save current LIBS to restore later
-saved_LIBS="$LIBS"
-LIBS="$LIBS $GMP_LIBS"
-AC_CHECK_LIB([gmp], [__gmpz_init], [], [AC_MSG_ERROR([GNU MP library not found. Please install libgmp-dev or gmp via your package manager.])], [])
-# Restore LIBS to prevent automatic addition of -lgmp
-LIBS="$saved_LIBS"
-
 AC_CHECK_DECLS([be32dec, le32dec, be32enc, le32enc], [], [],
 [AC_INCLUDES_DEFAULT
 #ifdef HAVE_SYS_ENDIAN_H
@@ -170,7 +117,6 @@ AC_CHECK_LIB([pthread], [pthread_create], PTHREAD_LIBS="-lpthread",
       AC_CHECK_LIB([pthreadGC], [pthread_create], PTHREAD_LIBS="-lpthreadGC"
 ))))
 
-
 AM_CONDITIONAL([WANT_JANSSON], [test x$request_jansson = xtrue])
 AM_CONDITIONAL([HAVE_WINDOWS], [test x$have_win32 = xtrue])
 AM_CONDITIONAL([USE_ASM], [test x$enable_assembly != xno])
@@ -202,7 +148,6 @@ AC_SUBST(JANSSON_LIBS)
 AC_SUBST(PTHREAD_FLAGS)
 AC_SUBST(PTHREAD_LIBS)
 AC_SUBST(WS2_LIBS)
-AC_SUBST(GMP_LIBS)
 
 AC_CONFIG_FILES([
 	Makefile

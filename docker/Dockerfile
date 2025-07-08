@@ -19,8 +19,7 @@ RUN apk update && apk add --no-cache \
     autoconf \
     automake \
     libtool \
-    git \
-    gmp-dev
+    git
 
 # Install development dependencies for libcurl
 RUN apk add --no-cache \
@@ -57,8 +56,7 @@ RUN apk add --no-cache \
     coreutils \
     libcurl \
     libgcc \
-    libstdc++ \
-    gmp
+    libstdc++
 
 # Create a non-root user to run the miner
 RUN adduser -D miner
