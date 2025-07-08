@@ -40,6 +40,7 @@
 #include "miner.h"
 #include "diff_to_target_gmp.h"
 
+
 // !ALPHA
 #include <time.h>
 #include <ctype.h>
@@ -1321,9 +1322,8 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 		free(xnonce2str);
 	}
 
-	//diff_to_target(work->target, sctx->job.diff / 65536.0);
-	diff_to_target_gmp(work->target, sctx->job.diff);
 
+	diff_to_target(work->target, sctx->job.diff / 16.0);
 	if (opt_debug) {
 		// Target is stored in little-endian 32-bit words
 		// We need to reverse the bytes for proper display
@@ -1339,7 +1339,6 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 		bin2hex(target_hex, target_be, 32);
 		applog(LOG_DEBUG, "DEBUG: diff = %.8f, target = %s", sctx->job.diff, target_hex);
 	}
-	int tmp=1;
 }
 
 // RandomX VM data structures shared by mining threads
