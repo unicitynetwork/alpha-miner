@@ -1,4 +1,4 @@
-AC_INIT([Alphaminer],[3.0.9])
+AC_INIT([Alphaminer],[4.0.0])
 
 AC_PREREQ([2.59c])
 AC_CANONICAL_TARGET
