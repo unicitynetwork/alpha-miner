@@ -39,6 +39,7 @@
 #include "compat.h"
 #include "miner.h"
 
+
 // !ALPHA
 #include <time.h>
 #include <ctype.h>
@@ -212,7 +213,7 @@ Options:\n\
   -T, --timeout=N       timeout for long polling, in seconds (default: none)\n\
   -s, --scantime=N      upper bound on time spent scanning current work when\n\
                           long polling is unavailable, in seconds (default: 5)\n\
-      --coinbase-addr=ADDR  payout address for solo mining\n\
+      --afile=FILE        file containing payout addresses for solo mining (required for solo mining)\n\
       --coinbase-sig=TEXT  data to insert in the coinbase when possible\n\
       --no-longpoll     disable long polling support\n\
       --no-getwork      disable getwork support\n\
@@ -318,15 +319,31 @@ static char *lp_id;
 
 
 // !ALPHA
-static void load_addresses_from_file(const char *filename) {
+static int load_addresses_from_file(const char *filename) {
     FILE *file = fopen(filename, "r");
     if (!file) {
         applog(LOG_ERR, "Failed to open address file: %s", filename);
-        exit(1);
+        return -1; // Return error code
     }
 
+    applog(LOG_INFO, "Loading payout addresses from file: %s", filename);
+    
+    // Free any previously loaded addresses
+    if (coinbase_addresses != NULL) {
+        for (int i = 0; i < num_addresses; i++) {
+            free(coinbase_addresses[i]);
+        }
+        free(coinbase_addresses);
+        coinbase_addresses = NULL;
+        num_addresses = 0;
+    }
+    
     char line[256];
+    int valid_addresses = 0;
+    int line_count = 0;
+    
     while (fgets(line, sizeof(line), file)) {
+        line_count++;
         // Remove newline
         line[strcspn(line, "\n")] = 0;
         
@@ -343,17 +360,52 @@ static void load_addresses_from_file(const char *filename) {
         // Skip empty lines
         if (*start == 0) continue;
         
+        
+        // 2. Validate address using address_to_script
+        // This internally uses bech32_decode for Alpha addresses
+        unsigned char script[128];
+        size_t script_size = address_to_script(script, sizeof(script), start);
+        if (script_size == 0) {
+            applog(LOG_WARNING, "Line %d: Invalid address (failed validation): %s", line_count, start);
+            continue;
+        }
+        
         coinbase_addresses = realloc(coinbase_addresses, (num_addresses + 1) * sizeof(char *));
+        if (coinbase_addresses == NULL) {
+            applog(LOG_ERR, "Memory allocation failed when loading addresses");
+            fclose(file);
+            return -2; // Memory allocation error
+        }
+        
         coinbase_addresses[num_addresses] = strdup(start);
+        if (coinbase_addresses[num_addresses] == NULL) {
+            applog(LOG_ERR, "Memory allocation failed when loading address: %s", start);
+            fclose(file);
+            return -2; // Memory allocation error
+        }
+        
+        if (opt_debug) {
+            applog(LOG_DEBUG, "Added payout address: %s", start);
+        }
+        
         num_addresses++;
+        valid_addresses++;
     }
 
     fclose(file);
 
-    if (num_addresses == 0) {
+    if (valid_addresses == 0) {
         applog(LOG_ERR, "No valid addresses found in file: %s", filename);
-        exit(1);
+        if (line_count == 0) {
+            applog(LOG_ERR, "The file is empty");
+        } else {
+            applog(LOG_ERR, "The file contained %d line(s), but none had valid addresses", line_count);
+        }
+        return 0; // File processed but no valid addresses
     }
+    
+    applog(LOG_INFO, "Loaded %d payout addresses from file", valid_addresses);
+    return valid_addresses;
 }
 
 
@@ -362,7 +414,11 @@ static void select_random_address(void)
     if (num_addresses > 0) {
         int random_index = rand() % num_addresses;
         pk_script_size = address_to_script(pk_script, sizeof(pk_script), coinbase_addresses[random_index]);
-        applog(LOG_INFO, "Selected new payout address: %s", coinbase_addresses[random_index]);
+        if (opt_debug) {
+            applog(LOG_DEBUG, "Selected new payout address: %s", coinbase_addresses[random_index]);
+        } else {
+            applog(LOG_INFO, "Selected new payout address");
+        }
     } else {
         applog(LOG_ERR, "No addresses loaded. Cannot select a new address.");
     }
@@ -751,12 +807,12 @@ static bool gbt_work_decode(const json_t *val, struct work *work)
 		work->data[9 + i] = be32dec((uint32_t *)merkle_tree[0] + i);
 	work->data[17] = swab32(curtime);
 
-	// !RandomX
+    // !RandomX
 	char epochSeedString[100];
 	memset(epochSeedString, 0, sizeof(epochSeedString));
 	uint32_t nEpoch = curtime/epochDuration;
 	sprintf(epochSeedString, "Alpha/RandomX/Epoch/%d", nEpoch);
-	sha256d(work->randomx_seed_hash, epochSeedString, strlen(epochSeedString));
+	sha256d(work->randomx_seed_hash, (const unsigned char*)epochSeedString, strlen(epochSeedString));
 	// !RandomX END
 
 	work->data[18] = le32dec(&bits);
@@ -827,7 +883,7 @@ static void share_result(int result, const char *reason)
 	if (opt_debug && reason)
 		applog(LOG_DEBUG, "DEBUG: reject reason: %s", reason);
     
-    if (result)
+    if (result && !have_stratum)
          select_random_address();
 }
 
@@ -1249,7 +1305,7 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 	uint32_t curtime = be32dec(&work->data[17]);
 	uint32_t nEpoch = curtime/(7 * 24 * 60 * 60);
 	sprintf(epochSeedString, "Alpha/RandomX/Epoch/%d", nEpoch);
-	sha256d(work->randomx_seed_hash, epochSeedString, strlen(epochSeedString));
+	sha256d(work->randomx_seed_hash, (const unsigned char*)epochSeedString, strlen(epochSeedString));
 	// !RandomX END
 
 	work->data[18] = le32dec(sctx->job.nbits);
@@ -1265,7 +1321,25 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 		free(xnonce2str);
 	}
 
-	diff_to_target(work->target, sctx->job.diff / 65536.0);
+
+	diff_to_target(work->target, sctx->job.diff / 16.0);
+
+	if (opt_debug) {
+		// Target is stored in little-endian 32-bit words
+		// We need to reverse the bytes for proper display
+		unsigned char target_be[32];
+		memset(target_be, 0, 32);
+		
+		// Reverse the byte order to big-endian for display
+		for (int i = 0; i < 8; i++) {
+			be32enc(target_be + i*4, work->target[7-i]);
+		}
+		
+		char target_hex[65] = {0};
+		bin2hex(target_hex, target_be, 32);
+		applog(LOG_DEBUG, "DEBUG: diff = %.8f, target = %s", sctx->job.diff, target_hex);
+	}
+
 }
 
 // RandomX VM data structures shared by mining threads
@@ -1402,7 +1476,7 @@ static void *miner_thread(void *userdata)
 			// Benchmarking requires a key to be set manually
 			if (opt_benchmark) {
 				const char *epochSeedString = "Alpha/RandomX/Epoch/2825";
-				sha256d(work.randomx_seed_hash, epochSeedString, strlen(epochSeedString));
+				sha256d(work.randomx_seed_hash, (const unsigned char*)epochSeedString, strlen(epochSeedString));
 
 #if 0
 				// Simulate epoch change and new vm creation during benchmarking
@@ -2081,12 +2155,9 @@ static void parse_arg(int key, char *arg, char *pname)
 		have_gbt = false;
 		break;
 	case 1013:			/* --coinbase-addr */
-		pk_script_size = address_to_script(pk_script, sizeof(pk_script), arg);
-		if (!pk_script_size) {
-			fprintf(stderr, "%s: invalid address -- '%s'\n",
-				pname, arg);
-			show_usage_and_exit(1);
-		}
+		fprintf(stderr, "Error: --coinbase-addr is no longer supported. Please use --afile instead.\n");
+		fprintf(stderr, "Create a text file with one address per line and use --afile=filename.\n");
+		show_usage_and_exit(1);
 		break;
 	case 1015:			/* --coinbase-sig */
 		if (strlen(arg) + 1 > sizeof(coinbase_sig)) {
@@ -2256,6 +2327,9 @@ int main(int argc, char *argv[])
 	long flags;
 	int i;
 
+	// Initialize random number generator
+	srand(time(NULL));
+
 	rpc_user = strdup("");
 	rpc_pass = strdup("");
 
@@ -2274,10 +2348,28 @@ int main(int argc, char *argv[])
 		sprintf(rpc_userpass, "%s:%s", rpc_user, rpc_pass);
 	}
 // !ALPHA
-    if (address_file) {
-        load_addresses_from_file(address_file);
-        srand(time(NULL));  // Initialize random number generator
+    if (!opt_benchmark && !have_stratum) {
+        if (!address_file) {
+            fprintf(stderr, "Error: Address file (--afile) is required for solo mining.\n");
+            show_usage_and_exit(1);
+        }
+        
+        int addresses_loaded = load_addresses_from_file(address_file);
+        if (addresses_loaded <= 0) {
+            fprintf(stderr, "Error: Could not load any valid addresses from %s.\n", address_file);
+            if (addresses_loaded == 0) { // Specifically if file was valid but empty
+                fprintf(stderr, "The file might be empty or contain no valid addresses.\n");
+            } else if (addresses_loaded == -1) {
+                fprintf(stderr, "Could not open the file. Check if it exists and has proper permissions.\n");
+            } else if (addresses_loaded == -2) {
+                fprintf(stderr, "Memory allocation error while loading addresses.\n");
+            }
+            show_usage_and_exit(1);
+        }
+        
         select_random_address();  // Select the first address
+    } else if (address_file) {
+        applog(LOG_INFO, "Note: Address file is ignored when using stratum or benchmark mode");
     }
 // !ALPHA END
 

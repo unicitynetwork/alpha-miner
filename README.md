@@ -35,17 +35,60 @@ Alphaminer depends on the following libraries:
 
 ## Linux
 
-To build for Ubuntu Linux (or WSL in Windows)
+### Ubuntu/Debian
 
-### Install dependencies
-```
+#### Install dependencies
+```bash
 sudo apt update
 sudo apt upgrade
 sudo apt install autoconf git build-essential pkg-config libcurl4-openssl-dev
 ```
 
-### Build instructions
+#### Build instructions
+
+```bash
+git clone https://github.com/unicitynetwork/alpha-miner --recursive
+cd alpha-miner
+./autogen.sh
+./configure
+make
 ```
+
+### CentOS/RHEL/Fedora
+
+#### Install dependencies
+
+For CentOS/RHEL 8+:
+```bash
+sudo dnf install autoconf git gcc gcc-c++ make pkgconfig libcurl-devel
+```
+
+For older CentOS/RHEL 7:
+```bash
+sudo yum install autoconf git gcc gcc-c++ make pkgconfig libcurl-devel
+```
+
+#### Build instructions
+
+```bash
+git clone https://github.com/unicitynetwork/alpha-miner --recursive
+cd alpha-miner
+./autogen.sh
+./configure
+make
+```
+
+### Arch Linux
+
+#### Install dependencies
+
+```bash
+sudo pacman -S autoconf git gcc make pkg-config curl
+```
+
+#### Build instructions
+
+```bash
 git clone https://github.com/unicitynetwork/alpha-miner --recursive
 cd alpha-miner
 ./autogen.sh
@@ -56,17 +99,19 @@ make
 
 ## MacOS
 
-
-```
+### Install dependencies
+```bash
 brew install git automake libtool pkg-config curl
+```
+
+### Build instructions
+```bash
 git clone https://github.com/unicitynetwork/alpha-miner --recursive
 cd alpha-miner
 ./autogen.sh
 ./configure
 make
 ```
-./minerd -h (examples below)
-
 
 
 ## Windows
@@ -139,7 +184,7 @@ make
 ./minerd --benchmark 
 ```
 
-- Test the performance with largepages. This can give an improvement of 100% in hashrate. 
+- Test the performance with largepages. Largepages can give a 2x improvement in hashrate. 
 
 ```
 ./minerd --benchmark --largepages
@@ -185,4 +230,20 @@ alpha1q54mypfl9wyx7z6h523qx242dr77nmensthmfu5
 
 ```
 ./minerd -o 127.0.0.1:8589 -O username:password  --afile="addresses.txt" --largepages
+```
+
+## Pool Mining (Stratum)
+
+- Connect to a mining pool using your wallet address:
+- www.unicity-pool.com is a pool for testing
+
+
+```
+./minerd -o stratum+tcp://unicity-pool.com:3054 -u YOUR_WALLET_ADDRESS
+```
+
+- Pool mining with large pages:
+
+```
+./minerd -o stratum+tcp://unicty-pool.com:3054 -u YOUR_WALLET_ADDRESS --largepages
 ```
