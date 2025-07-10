@@ -245,5 +245,80 @@ alpha1q54mypfl9wyx7z6h523qx242dr77nmensthmfu5
 - Pool mining with large pages:
 
 ```
-./minerd -o stratum+tcp://unicty-pool.com:3054 -u YOUR_WALLET_ADDRESS --largepages
+./minerd -o stratum+tcp://unicity-pool.com:3054 -u YOUR_WALLET_ADDRESS --largepages
 ```
+
+## Docker
+
+### Using Pre-built Docker Image
+
+The official Docker image is available at `ghcr.io/unicitynetwork/alpha-miner:latest`. You can use it directly without building:
+
+#### Solo Mining with Docker
+
+```bash
+docker run --rm --name alpha-miner \
+  --cpus=1 \
+  --add-host=host.docker.internal:host-gateway \
+  -v $(pwd)/addrs.txt:/home/miner/addrs.txt \
+  ghcr.io/unicitynetwork/alpha-miner:latest \
+  -o 'host.docker.internal:8589' \
+  -O user:password \
+  --largepages \
+  --no-affinity
+```
+
+**Docker arguments explained:**
+- `--rm`: Automatically remove the container when it stops
+- `--name alpha-miner`: Give the container a name for easy management
+- `--cpus=1`: Limit the container to use 1 CPU core (adjust as needed)
+- `--add-host=host.docker.internal:host-gateway`: Allow the container to connect to services on the host machine
+- `-v $(pwd)/addrs.txt:/home/miner/addrs.txt`: Mount your local addresses file into the container
+
+**Miner arguments explained:**
+- `-o 'host.docker.internal:8589'`: Connect to Alpha node on host machine port 8589
+- `-O user:password`: RPC credentials (replace with your actual credentials from alpha.conf)
+- `--largepages`: Enable large memory pages for ~2x performance improvement
+- `--no-affinity`: Disable CPU affinity (recommended for containers)
+
+#### Pool Mining with Docker
+
+```bash
+docker run --rm --name alpha-pool-miner \
+  --cpus=1 \
+  --add-host=host.docker.internal:host-gateway \
+  ghcr.io/unicitynetwork/alpha-miner:latest \
+  -o 'stratum+tcp://unicity-pool.com:3054' \
+  -u YOUR_ADDRESS \
+  -t 1 \
+  --largepages \
+  --no-affinity
+```
+
+**Additional arguments for pool mining:**
+- `-u alpha1qek8v...`: Your wallet address for receiving mining rewards
+- `-t 1`: Number of mining threads (should match --cpus value)
+
+### Building Docker Image Locally
+
+If you want to build the Docker image yourself:
+
+```bash
+# Clone the repository with submodules
+git clone https://github.com/unicitynetwork/alpha-miner --recursive
+cd alpha-miner
+
+# Build the Docker image
+docker build -t alpha-miner ./docker
+
+# Run your locally built image
+docker run --rm --name alpha-miner alpha-miner [miner arguments]
+```
+
+### Docker Tips
+
+1. **CPU Allocation**: Adjust `--cpus` to control how many CPU cores the miner uses
+2. **Running in Background**: Add `-d` flag to run the container in detached mode
+3. **View Logs**: Use `docker logs alpha-miner` to see miner output
+4. **Stop Mining**: Use `docker stop alpha-miner` to gracefully stop the container
+5. **Large Pages**: The container needs appropriate privileges for large pages to work effectively
