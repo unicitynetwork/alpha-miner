@@ -236,6 +236,7 @@ alpha1q54mypfl9wyx7z6h523qx242dr77nmensthmfu5
 
 - Connect to a mining pool using your wallet address:
 - www.unicity-pool.com is a pool for testing
+- www.nopoolnogain.net community operated pool
 
 
 ```
