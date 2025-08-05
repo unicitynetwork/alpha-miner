@@ -139,7 +139,7 @@ In MSYS2 terminal:
 
 ```
 git clone https://github.com/unicitynetwork/alpha-miner --recursive
-cd Alphaminer
+cd alpha-miner
 ./autogen.sh
 LIBCURL="-lcurl.dll" ./configure
 make
