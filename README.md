@@ -235,7 +235,7 @@ alpha1q54mypfl9wyx7z6h523qx242dr77nmensthmfu5
 ## Pool Mining (Stratum)
 
 - Connect to a mining pool using your wallet address:
-  - http://www.unicity-pool.com is the dev pool for testing
+  - http://www.unicity-pool.com pool maintained by the Unicity development team
   - http://www.nopoolnogain.net community operated pool
   - http://alphapool.ddns.net:8686/#alpha1  community operated pool
   - https://unicity.luckypool.io/ community operated pool
