@@ -13,14 +13,6 @@ Alphaminer supports:
 - Large pages for improved performance
 - Multi-threading capability
 
-
-## Community Mining
-If you would like to support the development, then you can add the community address to the list of mining addresses - see below for setup. Current ALPHA community address is 
-
-```
-alpha1qmmqcy66tyjfq5rgngxk4p2r34y9ny7cnnfq3wmfw8fyx03yahxkq0ck3kh
-```
-
 ## Download
 
 - [Binary Releases](https://github.com/unicitynetwork/alpha-miner/releases)
