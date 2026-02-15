@@ -202,14 +202,7 @@ rpcallowip= MINER_IP_ADDRESS
   - make sure that **"Enable RPC server"** is ticked under **"Options"**
 
 
-- Create an addresses file, e.g. **"addresses.txt"**. This allows for a different address to be randomly selected every time the miner wins a block reward. If you would like to support developement then add the community address to the list of addresses. The addresses file should contain one address per line:
-
-```
-alpha1qhhjespxz2wrd8l39d0m5ntswhsxza7dxz02yfg
-alpha1q54mypfl9wyx7z6h523qx242dr77nmensthmfu5
-...
-```
-
+- Create an addresses file, e.g. **"addresses.txt"**. This allows for a different address to be randomly selected every time the miner wins a block reward.
 
 - Solo mine on 4 CPU threads, connected to a local Alpha node. Replace username:password with the RPC user and password in the Alpha configuration file **alpha.conf**. 
 
