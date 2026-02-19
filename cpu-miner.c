@@ -618,6 +618,9 @@ static bool gbt_work_decode(const json_t *val, struct work *work)
 			applog(LOG_ERR, "JSON invalid coinbasetxn");
 			goto out;
 		}
+		applog(LOG_DEBUG, "Using pre-signed coinbase from coinbasetxn (%d bytes, txid %s)",
+			cbtx_size,
+			json_string_value(json_object_get(tmp, "txid")) ? "available" : "missing");
 	} else {
 		int64_t cbvalue;
 		if (!pk_script_size) {
@@ -701,7 +704,7 @@ static bool gbt_work_decode(const json_t *val, struct work *work)
 		cbtx_size += 4;
 		coinbase_append = true;
 	}
-	if (coinbase_append) {
+	if (coinbase_append && !json_object_get(val, "coinbasetxn")) {
 		unsigned char xsig[100];
 		int xsig_len = 0;
 		if (*coinbase_sig) {
@@ -757,7 +760,27 @@ static bool gbt_work_decode(const json_t *val, struct work *work)
 	merkle_tree = malloc(32 * ((1 + tx_count + 1) & ~1));
 	size_t tx_buf_size = 32 * 1024;
 	tx = malloc(tx_buf_size);
-	sha256d(merkle_tree[0], cbtx, cbtx_size);
+	/* When coinbasetxn provides a txid, use it directly for the merkle
+	 * leaf.  The "data" field is witness-serialized, so sha256d over it
+	 * yields the wtxid, not the txid required by the block merkle root.
+	 * The txid hex is in RPC display order (big-endian); memrev converts
+	 * to the internal little-endian order used by the merkle tree. */
+	{
+		json_t *cbtxn = json_object_get(val, "coinbasetxn");
+		const char *txid_hex = cbtxn
+			? json_string_value(json_object_get(cbtxn, "txid"))
+			: NULL;
+		if (cbtxn) {
+			if (!txid_hex || strlen(txid_hex) != 64) {
+				applog(LOG_ERR, "coinbasetxn present but missing valid txid");
+				goto out;
+			}
+			hex2bin(merkle_tree[0], txid_hex, 32);
+			memrev(merkle_tree[0], 32);
+		} else {
+			sha256d(merkle_tree[0], cbtx, cbtx_size);
+		}
+	}
 	for (i = 0; i < tx_count; i++) {
 		tmp = json_array_get(txa, i);
 		const char *tx_hex = json_string_value(json_object_get(tmp, "data"));
