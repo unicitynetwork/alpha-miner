@@ -1,3 +1,5 @@
+❗ Phase I - community mining officially ended with a hard fork at block 450 000 on 19th February 2026. There will be no more public mining until TGE and no block rewards until TGE. All tx fees are being burnt. However, transactions work as usual. ❗
+
 # Alphaminer
 
 - Alphaminer is a free, high performance, open source, cross platform CPU miner for mining Alpha.
